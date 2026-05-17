@@ -1,9 +1,7 @@
-import axios from "axios";
+import api from "./api";
 import { cookies } from "next/headers";
 import { User } from "@/types/user";
 import { Note } from "@/types/note";
-
-const baseURL = process.env.NEXT_PUBLIC_API_URL + "/api";
 
 interface NotesParams {
   search?: string;
@@ -24,29 +22,24 @@ const getHeaders = async () => {
 
 export const checkSession = async () => {
   const headers = await getHeaders();
-  const res = await axios.get<User | null>(`${baseURL}/auth/session`, {
-    headers,
-  });
-  return res.data;
+  const res = await api.get<User | null>("/auth/session", { headers });
+  return res;
 };
 
 export const getMe = async () => {
   const headers = await getHeaders();
-  const res = await axios.get<User>(`${baseURL}/users/me`, { headers });
+  const res = await api.get<User>("/users/me", { headers });
   return res.data;
 };
 
 export const fetchNotes = async (params?: NotesParams) => {
   const headers = await getHeaders();
-  const res = await axios.get<NotesResponse>(`${baseURL}/notes`, {
-    headers,
-    params,
-  });
+  const res = await api.get<NotesResponse>("/notes", { headers, params });
   return res.data;
 };
 
 export const fetchNoteById = async (id: string) => {
   const headers = await getHeaders();
-  const res = await axios.get<Note>(`${baseURL}/notes/${id}`, { headers });
+  const res = await api.get<Note>(`/notes/${id}`, { headers });
   return res.data;
 };

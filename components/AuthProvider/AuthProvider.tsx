@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { checkSession } from "@/lib/api/clientApi";
+import { checkSession, getMe } from "@/lib/api/clientApi";
 import useAuthStore from "@/lib/store/authStore";
 
 const PRIVATE_PATHS = ["/profile", "/notes"];
@@ -21,8 +21,9 @@ export default function AuthProvider({
 
   useEffect(() => {
     checkSession()
-      .then((user) => {
-        if (user) {
+      .then(async (session) => {
+        if (session) {
+          const user = await getMe();
           setUser(user);
         } else if (isPrivate) {
           clearIsAuthenticated();

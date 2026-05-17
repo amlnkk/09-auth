@@ -1,25 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkSession } from "./lib/api/serverApi";
 
 const PRIVATE_PATHS = ["/profile", "/notes"];
 const AUTH_PATHS = ["/sign-in", "/sign-up"];
 
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  const allCookies = req.cookies.getAll();
-  const hasToken = allCookies.some(
-    (c) => c.name.includes("token") || c.name.includes("session"),
-  );
+  const accessToken = req.cookies.get("accessToken");
+  const refreshToken = req.cookies.get("refreshToken");
 
   const isPrivate = PRIVATE_PATHS.some((p) => pathname.startsWith(p));
   const isAuth = AUTH_PATHS.some((p) => pathname.startsWith(p));
 
-  if (isPrivate && !hasToken) {
+  let isAuthenticated = !!accessToken;
+
+  if (!accessToken && refreshToken) {
+    try {
+      const response = await checkSession();
+      if (response) {
+        isAuthenticated = true;
+        const res = NextResponse.next();
+        return res;
+      }
+    } catch {
+      isAuthenticated = false;
+    }
+  }
+
+  if (isPrivate && !isAuthenticated) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
-  if (isAuth && hasToken) {
-    return NextResponse.redirect(new URL("/profile", req.url));
+  if (isAuth && isAuthenticated) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
