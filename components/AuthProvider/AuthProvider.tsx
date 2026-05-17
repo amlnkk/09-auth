@@ -25,8 +25,16 @@ export default function AuthProvider({
         if (session) {
           const user = await getMe();
           setUser(user);
-        } else if (isPrivate) {
+        } else {
           clearIsAuthenticated();
+          if (isPrivate) {
+            router.push("/sign-in");
+          }
+        }
+      })
+      .catch(() => {
+        clearIsAuthenticated();
+        if (isPrivate) {
           router.push("/sign-in");
         }
       })

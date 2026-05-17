@@ -20,7 +20,14 @@ export async function proxy(req: NextRequest) {
       const response = await checkSession();
       if (response) {
         isAuthenticated = true;
-        const res = NextResponse.next();
+        const res = isPrivate ? NextResponse.next() : NextResponse.next();
+        const setCookie = response.headers["set-cookie"];
+        if (setCookie) {
+          const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+          cookies.forEach((cookie) => {
+            res.headers.append("set-cookie", cookie);
+          });
+        }
         return res;
       }
     } catch {
