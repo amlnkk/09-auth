@@ -30,7 +30,7 @@ export default function AuthProvider({
         }
       })
       .finally(() => setLoading(false));
-  }, [pathname]);
+  }, [pathname, isPrivate, setUser, clearIsAuthenticated, router]);
 
   if (loading && isPrivate) {
     return <div>Loading...</div>;
