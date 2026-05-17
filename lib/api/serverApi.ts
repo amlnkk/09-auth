@@ -12,6 +12,11 @@ interface NotesParams {
   tag?: string;
 }
 
+interface NotesResponse {
+  notes: Note[];
+  totalPages: number;
+}
+
 const getHeaders = async () => {
   const cookieStore = await cookies();
   return { Cookie: cookieStore.toString() };
@@ -33,7 +38,7 @@ export const getMe = async () => {
 
 export const fetchNotes = async (params?: NotesParams) => {
   const headers = await getHeaders();
-  const res = await axios.get<Note[]>(`${baseURL}/notes`, {
+  const res = await axios.get<NotesResponse>(`${baseURL}/notes`, {
     headers,
     params,
   });
