@@ -3,11 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 const PRIVATE_PATHS = ["/profile", "/notes"];
 const AUTH_PATHS = ["/sign-in", "/sign-up"];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Перевіряємо наявність токена в куках
-  // Назву куки перевір у документації бекенду
   const allCookies = req.cookies.getAll();
   const hasToken = allCookies.some(
     (c) => c.name.includes("token") || c.name.includes("session"),
